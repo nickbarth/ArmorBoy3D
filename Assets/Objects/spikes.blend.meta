@@ -1,0 +1,115 @@
+fileFormatVersion: 2
+guid: ce0e8df6bbd1a44dbb45d1435f63a772
+ModelImporter:
+  serializedVersion: 16
+  fileIDToRecycleName:
+    100000: Cone
+    100002: Cone_001
+    100004: Cone_002
+    100006: Cone_003
+    100008: Cone_004
+    100010: Cone_005
+    100012: Cone_006
+    100014: Cone_007
+    100016: Cone_008
+    100018: //RootNode
+    100020: Cone_000
+    400000: Cone
+    400002: Cone_001
+    400004: Cone_002
+    400006: Cone_003
+    400008: Cone_004
+    400010: Cone_005
+    400012: Cone_006
+    400014: Cone_007
+    400016: Cone_008
+    400018: //RootNode
+    400020: Cone_000
+    2300000: Cone
+    2300002: Cone_001
+    2300004: Cone_002
+    2300006: Cone_003
+    2300008: Cone_004
+    2300010: Cone_005
+    2300012: Cone_006
+    2300014: Cone_007
+    2300016: Cone_008
+    2300018: //RootNode
+    2300020: Cone_000
+    3300000: Cone
+    3300002: Cone_001
+    3300004: Cone_002
+    3300006: Cone_003
+    3300008: Cone_004
+    3300010: Cone_005
+    3300012: Cone_006
+    3300014: Cone_007
+    3300016: Cone_008
+    3300018: //RootNode
+    3300020: Cone_000
+    4300000: Cone
+    4300002: Cone_001
+    4300004: Cone_003
+    4300006: Cone_002
+    4300008: Cone_004
+    4300010: Cone_005
+    4300012: Cone_006
+    4300014: Cone_007
+    4300016: Cone_008
+    4300018: Cone_000
+    7400000: Default Take
+    9500000: //RootNode
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationCompression: 1
+    animationRotationError: .5
+    animationPositionError: .5
+    animationScaleError: .5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+  tangentSpace:
+    normalSmoothAngle: 60
+    splitTangentsAcrossUV: 1
+    normalImportMode: 0
+    tangentImportMode: 1
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: .5
+    foreArmTwist: .5
+    upperLegTwist: .5
+    legTwist: .5
+    armStretch: .0500000007
+    legStretch: .0500000007
+    feetSpacing: 0
+    rootMotionBoneName: 
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  additionalBone: 0
+  userData: 
