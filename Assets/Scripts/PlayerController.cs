@@ -7,6 +7,8 @@ public class PlayerController : MonoBehaviour {
 	public bool grounded;
 	public bool walledRight;
 	public bool walledLeft;
+	public bool breaking;
+
 	public bool faceRight;
 	public float coolDown;
 	public RaycastHit hit;
@@ -15,43 +17,20 @@ public class PlayerController : MonoBehaviour {
 
 	public GameObject swordStrike;
 	public GameObject DeathParticles;
-
 	private GameObject particles;
-	private static bool attacking;
 	private bool isDead;
-
 	public GameObject lastCheckPoint;
+	
+	private static bool attacking;
 
 	public static bool isAttacking () {
 		return attacking;
 	}
 
-	void doTestFunction () {
-		bool lol = true;
-	}
-
-	/*
-	private void OnGUI(){
-
-		if (GUI.RepeatButton (new Rect (20, 500, 100, 100), "<")) {
-			Move(-0.5f);
-		}
-		
-		if (GUI.RepeatButton (new Rect (130, 500, 100, 100), ">")) {
-			Move(0.5f);
-		}
-		
-		if(GUI.RepeatButton(new Rect(840, 500, 100, 100), "^")){
-			Jump();
-		}
-
-		if(GUI.RepeatButton(new Rect(950, 500, 100, 100), "O")){
-			Attack();
-		}
-	}
-	*/
+	public bool levelCompleted;
 
 	void Start () {
+		levelCompleted = false;
 		isDead = false;
 		attacking = false;
 		coolDown = 0;
@@ -63,6 +42,8 @@ public class PlayerController : MonoBehaviour {
 	
 	void FixedUpdate () {
 		float h = Input.GetAxis("Horizontal");
+
+		if (levelCompleted) return;
 
 		if (h != 0) {
 				Move (h);
@@ -100,6 +81,7 @@ public class PlayerController : MonoBehaviour {
 
 	public void Attack () {
 		if (coolDown == 0f && !isDead) {
+
 			anim.SetBool("Attacking", true);
 			attacking = true;
 			rigidbody.velocity = new Vector3(faceRight ? 10.0f : -10.0f, 0f, 0f);
@@ -115,15 +97,34 @@ public class PlayerController : MonoBehaviour {
 		Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.down) * 0.4f, Color.green);
 		Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.right) * 0.1f, Color.red);
 		Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.left) * 0.4f, Color.blue);
+		Debug.DrawRay(new Vector3(transform.position.x, transform.position.y + 0.05f, transform.position.z), transform.TransformDirection(faceRight ? Vector3.right : Vector3.left) * 0.5f, Color.yellow);
 
-		walledRight = Physics.Raycast(transform.position, Vector3.right, out hit, 0.1f); 
-		walledLeft = Physics.Raycast(transform.position, Vector3.left, out hit, 0.4f); 
-		grounded = Physics.Raycast(transform.position, Vector3.down, out hit, 0.4f); 
+		if (levelCompleted) return;
+		
+		int noEnemiesLayer = 1 << 8;
+
+		walledRight = Physics.Raycast(transform.position, Vector3.right, out hit, 0.1f, ~noEnemiesLayer);
+		walledLeft = Physics.Raycast(transform.position, Vector3.left, out hit, 0.4f, ~noEnemiesLayer);
+		grounded = Physics.Raycast(transform.position, Vector3.down, out hit, 0.4f, ~noEnemiesLayer); 
+
+		breaking = Physics.Raycast(transform.position, faceRight ? Vector3.right : Vector3.left, out hit, 0.5f, ~9); 
+		if (breaking && hit.collider.gameObject.tag == "Breakable" && attacking) {
+			hit.collider.gameObject.GetComponent<Breakable>().Break();
+			rigidbody.velocity = new Vector3(rigidbody.velocity.x / 2, rigidbody.velocity.y / 2, rigidbody.velocity.z / 2);
+		}
 
 		if (particles) {
 			var pos = new Vector3(transform.position.x + (faceRight ? 0.4f : -0.4f), transform.position.y, transform.position.z);
 			particles.transform.position = pos;
 			particles.transform.rotation = Quaternion.Euler(0, (faceRight ? -90f : 90f), 0);
+		}
+		
+		if (attacking && !faceRight & walledLeft) {
+			rigidbody.velocity = new Vector3(3f, -2f, 0f);
+		}
+		
+		if (attacking && faceRight & walledRight) {
+			rigidbody.velocity = new Vector3(-3f, -2f, 0f);
 		}
 
 		if (Input.GetKey(KeyCode.UpArrow)) {
@@ -139,6 +140,7 @@ public class PlayerController : MonoBehaviour {
 		}
 		
 		if (coolDown >= 1.5f) {
+			rigidbody.velocity = new Vector3(0f, rigidbody.velocity.y, 0f);
 			anim.SetBool("Attacking", false);
 			attacking = false;
 		}
@@ -150,6 +152,10 @@ public class PlayerController : MonoBehaviour {
 	
 	void OnCollisionEnter(Collision collision) {
 		if (collision.gameObject.tag == "BadTouch") {
+			Kill();
+		}
+
+		if (collision.gameObject.tag == "Enemy" && !attacking) {
 			Kill();
 		}
 	}
@@ -164,9 +170,26 @@ public class PlayerController : MonoBehaviour {
 		}
 	}
 
+	void OnTriggerStay(Collider collider) {
+		if (collider.gameObject.tag == "LevelPoint") {
+			levelCompleted = true;
+
+			if (transform.position.x < collider.gameObject.transform.position.x) {
+				rigidbody.velocity = new Vector3(0f, 1f, 0f);
+				float step = 2f * Time.deltaTime;
+				transform.position = Vector3.MoveTowards(transform.position, collider.gameObject.transform.position, step);
+			} else {
+				rigidbody.velocity = new Vector3(0f, 5f, 0f);
+			}
+		}
+	}
+
 	void Kill() {
 		Object particles = Instantiate(DeathParticles, transform.position, Quaternion.identity);
 		Destroy(particles, 1f);
+
+		rigidbody.velocity = new Vector3(0f, 0f, 0f);
+
 		if (!isDead) {
 			StartCoroutine (Respawn ());
 		}
