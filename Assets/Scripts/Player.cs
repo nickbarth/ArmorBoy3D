@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class PlayerController : MonoBehaviour {
+public class Player : MonoBehaviour {
 
 	public Animator anim;
 	public bool grounded;
@@ -18,20 +18,19 @@ public class PlayerController : MonoBehaviour {
 	public GameObject swordStrike;
 	public GameObject DeathParticles;
 	private GameObject particles;
-	private bool isDead;
-	public GameObject lastCheckPoint;
+
+	public static bool dead;
+	public static GameObject lastCheckPoint;
 	
 	private static bool attacking;
-
-	public static bool isAttacking () {
+	public static bool isAttacking() {
 		return attacking;
 	}
-
 	public bool levelCompleted;
 
 	void Start () {
 		levelCompleted = false;
-		isDead = false;
+		dead = false;
 		attacking = false;
 		coolDown = 0;
 		faceRight = true;
@@ -63,7 +62,7 @@ public class PlayerController : MonoBehaviour {
 			anim.SetBool("Walking", true);
 		}
 
-		if ((!walledRight && h > 0 || !walledLeft && h < 0) && !isDead) {
+		if ((!walledRight && h > 0 || !walledLeft && h < 0) && !dead) {
 			transform.Translate(new Vector3(h * 0.1f, 0, 0));
 		}
 
@@ -80,7 +79,7 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	public void Attack () {
-		if (coolDown == 0f && !isDead) {
+		if (coolDown == 0f && !dead) {
 
 			anim.SetBool("Attacking", true);
 			attacking = true;
@@ -128,7 +127,7 @@ public class PlayerController : MonoBehaviour {
 		}
 
 		if (Input.GetKey(KeyCode.UpArrow)) {
-			Jump ();
+			Jump();
 		}
 
 		if (Input.GetKey(KeyCode.Space)) {
@@ -163,6 +162,7 @@ public class PlayerController : MonoBehaviour {
 	void OnTriggerEnter(Collider collider) {
 		if (collider.gameObject.tag == "CheckPoint") {
 			lastCheckPoint = collider.gameObject;
+			collider.gameObject.SetActive(false);
 		}
 
 		if (collider.gameObject.tag == "BadTouch") {
@@ -173,6 +173,7 @@ public class PlayerController : MonoBehaviour {
 	void OnTriggerStay(Collider collider) {
 		if (collider.gameObject.tag == "LevelPoint") {
 			levelCompleted = true;
+			GameFader.EndScene();
 
 			if (transform.position.x < collider.gameObject.transform.position.x) {
 				rigidbody.velocity = new Vector3(0f, 1f, 0f);
@@ -190,17 +191,17 @@ public class PlayerController : MonoBehaviour {
 
 		rigidbody.velocity = new Vector3(0f, 0f, 0f);
 
-		if (!isDead) {
-			StartCoroutine (Respawn ());
+		if (!dead) {
+			StartCoroutine(Respawn());
 		}
 	}
 
 	IEnumerator Respawn () {
-		isDead = true;
+		dead = true;
 		gameObject.renderer.enabled = false;
 		yield return new WaitForSeconds(1);		
 		gameObject.renderer.enabled = true;
-		isDead = false;
+		dead = false;
 		transform.position = new Vector3(lastCheckPoint.transform.position.x, lastCheckPoint.transform.position.y, transform.position.z);
 	}
 }

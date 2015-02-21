@@ -9,12 +9,18 @@ public class Enemy : MonoBehaviour {
 	public bool goingForward;
 	public float moveSpeed;
 
+	public GameObject WaitObject;
+
 	void Start () {
 		goingForward = true;
-		moveSpeed = 0.01f;
+		if (moveSpeed == 0) {
+			moveSpeed = 0.03f;
+		}
 	}
 
 	void Update () {
+		if (WaitObject != null && WaitObject.activeSelf) return;
+
 		Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.down) * 0.4f, Color.green);
 		Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.right) * 0.4f, Color.red);
 		Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.left) * 0.4f, Color.blue);
@@ -37,20 +43,28 @@ public class Enemy : MonoBehaviour {
 	}
 
 	void OnTriggerEnter(Collider collider) {
-		if (collider.gameObject.tag == "Player" && PlayerController.isAttacking()) {
-			this.Kill();
+		if (collider.gameObject.tag == "BadTouch") {
+			Kill();
+		}
+
+		if (collider.gameObject.tag == "Player" && Player.isAttacking()) {
+			Kill();
 		}
 	}
 	
 	void OnCollisionEnter(Collision collision) {
-		if (collision.gameObject.tag == "Player" && PlayerController.isAttacking()) {
-			this.Kill();
+		if (collision.gameObject.tag == "BadTouch") {
+			Kill();
+		}
+
+		if (collision.gameObject.tag == "Player" && Player.isAttacking()) {
+			Kill();
 		}
 	}
 	
 	void Kill () {
 		Object particles = Instantiate(DeathParticles, transform.position, Quaternion.identity);
-		Destroy(this.gameObject);
+		Destroy(gameObject);
 		Destroy(particles, 1f);
 	}
 }

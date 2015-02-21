@@ -178,6 +178,7 @@ ModelImporter:
     100344: Cube_182
     100346: Cube_183
     100348: Cube_184
+    100350: Spikes_003
     400000: Cube
     400002: Cube_000
     400004: Cube_001
@@ -353,6 +354,7 @@ ModelImporter:
     400344: Cube_182
     400346: Cube_183
     400348: Cube_184
+    400350: Spikes_003
     2300000: Cube
     2300002: Cube_000
     2300004: Cube_001
@@ -527,6 +529,7 @@ ModelImporter:
     2300342: Cube_182
     2300344: Cube_183
     2300346: Cube_184
+    2300348: Spikes_003
     3300000: Cube
     3300002: Cube_000
     3300004: Cube_001
@@ -701,6 +704,7 @@ ModelImporter:
     3300342: Cube_182
     3300344: Cube_183
     3300346: Cube_184
+    3300348: Spikes_003
     4300000: Cube_002
     4300002: Cube_000
     4300004: Cube
@@ -875,6 +879,7 @@ ModelImporter:
     4300342: Cube_182
     4300344: Cube_183
     4300346: Cube_184
+    4300348: Spikes_003
     7400000: Default Take
     9500000: //RootNode
   materials:
