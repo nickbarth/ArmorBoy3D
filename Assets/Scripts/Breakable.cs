@@ -6,7 +6,7 @@ public class Breakable : MonoBehaviour {
 	
 	public void Break () {
 		Object particles = Instantiate(WoodExplode, transform.position, Quaternion.identity);
-		Destroy(this.gameObject);
+		Destroy(gameObject);
 		Destroy(particles, 1f);
 	}
 }

@@ -2,7 +2,6 @@
 using System.Collections;
 
 public class Player : MonoBehaviour {
-
 	public Animator anim;
 	public bool grounded;
 	public bool walledRight;
@@ -104,7 +103,12 @@ public class Player : MonoBehaviour {
 
 		walledRight = Physics.Raycast(transform.position, Vector3.right, out hit, 0.1f, ~noEnemiesLayer);
 		walledLeft = Physics.Raycast(transform.position, Vector3.left, out hit, 0.4f, ~noEnemiesLayer);
+
+
 		grounded = Physics.Raycast(transform.position, Vector3.down, out hit, 0.4f, ~noEnemiesLayer); 
+		if (grounded && hit.collider.gameObject.tag == "Fallable") {
+			hit.collider.gameObject.GetComponent<Fallable>().Fall();
+		}
 
 		breaking = Physics.Raycast(transform.position, faceRight ? Vector3.right : Vector3.left, out hit, 0.5f, ~9); 
 		if (breaking && hit.collider.gameObject.tag == "Breakable" && attacking) {
@@ -198,10 +202,12 @@ public class Player : MonoBehaviour {
 
 	IEnumerator Respawn () {
 		dead = true;
+		collider.enabled = false;
 		gameObject.renderer.enabled = false;
 		yield return new WaitForSeconds(1);		
 		gameObject.renderer.enabled = true;
 		dead = false;
+		collider.enabled = true;
 		transform.position = new Vector3(lastCheckPoint.transform.position.x, lastCheckPoint.transform.position.y, transform.position.z);
 	}
 }
