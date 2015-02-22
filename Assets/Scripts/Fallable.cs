@@ -11,6 +11,7 @@ public class Fallable : MonoBehaviour {
 
 	private Vector3 pos;
 	private Quaternion rot;
+	private Object explosion;
 
 	void Awake () {
 		if (delay == 0) {
@@ -51,11 +52,11 @@ public class Fallable : MonoBehaviour {
 	}
 
 	void Kill() {
-		Object explosion = Instantiate(particles, transform.position, Quaternion.identity);
-		Destroy(explosion, 1f);
-		
-		rigidbody.velocity = new Vector3(0f, 0f, 0f);
-		StartCoroutine(Respawn());
+		if (explosion == null) {
+			explosion = Instantiate (particles, transform.position, Quaternion.identity);
+			Destroy (explosion, 1f);
+		}
+		StartCoroutine(Respawn ());
 	}
 	
 	IEnumerator Respawn () {

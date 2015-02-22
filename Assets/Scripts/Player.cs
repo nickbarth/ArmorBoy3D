@@ -179,6 +179,9 @@ public class Player : MonoBehaviour {
 			levelCompleted = true;
 			GameFader.EndScene();
 
+			anim.SetBool("Attacking", false);
+			anim.SetBool("Walking", true);
+
 			if (transform.position.x < collider.gameObject.transform.position.x) {
 				rigidbody.velocity = new Vector3(0f, 1f, 0f);
 				float step = 2f * Time.deltaTime;
