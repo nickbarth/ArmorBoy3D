@@ -4,15 +4,13 @@ using System.Collections;
 
 public class GameFader : MonoBehaviour
 {
-	public string NextLevel;
-
 	private static RectTransform rt;
 	private static Image image;
 	private static bool sceneStart = false;
 	private static bool sceneEnd = false;
 	private static float timer = 0f;
 	private static Color fade = Color.black;
-	private static string goToLevel;
+	private static string nextLevel;
 	private static GameObject fader;
 
 	void Awake ()
@@ -22,11 +20,6 @@ public class GameFader : MonoBehaviour
 		rt.sizeDelta = new Vector2(Screen.width, Screen.height);
 		image = transform.GetComponent<Image>();
 		image.color = fade;
-	}
-
-	void Start () {
-		goToLevel = NextLevel;
-		StartScene();
 	}
 
 	void Update ()
@@ -49,7 +42,7 @@ public class GameFader : MonoBehaviour
 				timer = 0f;
 				sceneEnd = false;
 				image.color = fade;
-				Application.LoadLevel(goToLevel);
+				Application.LoadLevel(nextLevel);
 			}
 		}
 	}
@@ -66,8 +59,9 @@ public class GameFader : MonoBehaviour
 		sceneEnd = false;
 	}
 
-	public static void EndScene ()
+	public static void EndScene (string next)
 	{
+		nextLevel = next;
 		sceneStart = false;
 		sceneEnd = true;
 		fader.SetActive(true);

@@ -2,33 +2,28 @@
 using System.Collections;
 
 public class Player : MonoBehaviour {
-	public Animator anim;
-	public bool grounded;
-	public bool walledRight;
-	public bool walledLeft;
-	public bool breaking;
-
-	public bool faceRight;
-	public float coolDown;
-	public RaycastHit hit;
-
-	public float moveSpeed;
-
-	public GameObject swordStrike;
-	public GameObject DeathParticles;
-	private GameObject particles;
-
+	public static bool attacking;
 	public static bool dead;
 	public static GameObject lastCheckPoint;
+
+	public Animator anim;
 	
-	private static bool attacking;
-	public static bool isAttacking() {
-		return attacking;
-	}
-	public bool levelCompleted;
+	public GameObject swordStrike;
+	public GameObject DeathParticles;
+
+	private GameObject particles;
+
+	private bool grounded;
+	private bool walledRight;
+	private bool walledLeft;
+
+	private bool faceRight;
+	private float coolDown;
+	private RaycastHit hit;
+
+	private float moveSpeed;
 
 	void Start () {
-		levelCompleted = false;
 		dead = false;
 		attacking = false;
 		coolDown = 0;
@@ -41,7 +36,7 @@ public class Player : MonoBehaviour {
 	void FixedUpdate () {
 		float h = Input.GetAxis("Horizontal");
 
-		if (levelCompleted) return;
+		if (GameManager.levelCompleted) return;
 
 		if (h != 0) {
 				Move (h);
@@ -80,6 +75,8 @@ public class Player : MonoBehaviour {
 	public void Attack () {
 		if (coolDown == 0f && !dead) {
 
+			GameManager.MakeBreakablesTrigger();
+
 			anim.SetBool("Attacking", true);
 			attacking = true;
 			rigidbody.velocity = new Vector3(faceRight ? 10.0f : -10.0f, 0f, 0f);
@@ -97,23 +94,16 @@ public class Player : MonoBehaviour {
 		Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.left) * 0.4f, Color.blue);
 		Debug.DrawRay(new Vector3(transform.position.x, transform.position.y + 0.05f, transform.position.z), transform.TransformDirection(faceRight ? Vector3.right : Vector3.left) * 0.5f, Color.yellow);
 
-		if (levelCompleted) return;
+		if (GameManager.levelCompleted) return;
 		
 		int noEnemiesLayer = 1 << 8;
 
 		walledRight = Physics.Raycast(transform.position, Vector3.right, out hit, 0.1f, ~noEnemiesLayer);
 		walledLeft = Physics.Raycast(transform.position, Vector3.left, out hit, 0.4f, ~noEnemiesLayer);
 
-
 		grounded = Physics.Raycast(transform.position, Vector3.down, out hit, 0.4f, ~noEnemiesLayer); 
 		if (grounded && hit.collider.gameObject.tag == "Fallable") {
 			hit.collider.gameObject.GetComponent<Fallable>().Fall();
-		}
-
-		breaking = Physics.Raycast(transform.position, faceRight ? Vector3.right : Vector3.left, out hit, 0.5f, ~9); 
-		if (breaking && hit.collider.gameObject.tag == "Breakable" && attacking) {
-			hit.collider.gameObject.GetComponent<Breakable>().Break();
-			rigidbody.velocity = new Vector3(rigidbody.velocity.x / 2, rigidbody.velocity.y / 2, rigidbody.velocity.z / 2);
 		}
 
 		if (particles) {
@@ -146,6 +136,7 @@ public class Player : MonoBehaviour {
 			rigidbody.velocity = new Vector3(0f, rigidbody.velocity.y, 0f);
 			anim.SetBool("Attacking", false);
 			attacking = false;
+			GameManager.MakeBreakablesTrigger(false);
 		}
 
 		if (coolDown >= 2.0f) {
@@ -169,15 +160,14 @@ public class Player : MonoBehaviour {
 			collider.gameObject.SetActive(false);
 		}
 
-		if (collider.gameObject.tag == "BadTouch") {
+		if (collider.gameObject.tag == "BadTouch" || (collider.gameObject.tag == "Enemy" && !attacking)) {
 			Kill();
 		}
 	}
 
 	void OnTriggerStay(Collider collider) {
 		if (collider.gameObject.tag == "LevelPoint") {
-			levelCompleted = true;
-			GameFader.EndScene();
+			GameManager.levelCompleted = true;
 
 			anim.SetBool("Attacking", false);
 			anim.SetBool("Walking", true);
@@ -207,6 +197,7 @@ public class Player : MonoBehaviour {
 		dead = true;
 		collider.enabled = false;
 		gameObject.renderer.enabled = false;
+		lastCheckPoint.gameObject.GetComponent<CheckPoint>().Respawn();
 		yield return new WaitForSeconds(1);		
 		gameObject.renderer.enabled = true;
 		dead = false;
