@@ -74,12 +74,23 @@ public class Player : MonoBehaviour {
 
 	public void Attack () {
 		if (coolDown == 0f && !dead) {
+			attacking = true;
+			anim.SetBool("Attacking", true);
 
 			GameManager.MakeBreakablesTrigger();
 
-			anim.SetBool("Attacking", true);
-			attacking = true;
-			rigidbody.velocity = new Vector3(faceRight ? 10.0f : -10.0f, 0f, 0f);
+			int noEnemiesLayer = 1 << 8;
+			walledRight = Physics.Raycast(transform.position, Vector3.right, out hit, 0.2f, ~noEnemiesLayer);
+			walledLeft = Physics.Raycast(transform.position, Vector3.left, out hit, 0.2f, ~noEnemiesLayer);
+
+			if (attacking && !faceRight & walledLeft) {
+				rigidbody.velocity = new Vector3(3f, -2f, 0f);
+			} else if (attacking && faceRight & walledRight) {
+				rigidbody.velocity = new Vector3(-3f, -2f, 0f);
+			} else {
+				rigidbody.velocity = new Vector3(faceRight ? 10.0f : -10.0f, 0f, 0f);
+			}
+
 			coolDown = 1f;
 			
 			var pos = new Vector3(transform.position.x + (faceRight ? 0.4f : -0.4f), transform.position.y, transform.position.z);
@@ -91,15 +102,13 @@ public class Player : MonoBehaviour {
 	void Update () {
 		Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.down) * 0.4f, Color.green);
 		Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.right) * 0.1f, Color.red);
-		Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.left) * 0.4f, Color.blue);
-		Debug.DrawRay(new Vector3(transform.position.x, transform.position.y + 0.05f, transform.position.z), transform.TransformDirection(faceRight ? Vector3.right : Vector3.left) * 0.5f, Color.yellow);
+		Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.left) * 0.1f, Color.blue);
 
 		if (GameManager.levelCompleted) return;
 		
 		int noEnemiesLayer = 1 << 8;
-
-		walledRight = Physics.Raycast(transform.position, Vector3.right, out hit, 0.1f, ~noEnemiesLayer);
-		walledLeft = Physics.Raycast(transform.position, Vector3.left, out hit, 0.4f, ~noEnemiesLayer);
+		walledRight = Physics.Raycast(transform.position, Vector3.right, out hit, 0.2f, ~noEnemiesLayer);
+		walledLeft = Physics.Raycast(transform.position, Vector3.left, out hit, 0.2f, ~noEnemiesLayer);
 
 		grounded = Physics.Raycast(transform.position, Vector3.down, out hit, 0.4f, ~noEnemiesLayer); 
 		if (grounded && hit.collider.gameObject.tag == "Fallable") {

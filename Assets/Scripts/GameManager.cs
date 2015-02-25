@@ -7,6 +7,13 @@ public class GameManager : MonoBehaviour {
 	private static GameObject[] breakables;
 
 	void Start() {
+		#if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WEBPLAYER
+		GameObject.Find("LeftButton").SetActive(false);
+		GameObject.Find("RightButton").SetActive(false);
+		GameObject.Find("JumpButton").SetActive(false);
+		GameObject.Find("AttackButton").SetActive(false);
+		#endif
+
 		GameManager.levelCompleted = false;
 		GameFader.StartScene();
 	}
