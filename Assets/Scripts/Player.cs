@@ -21,9 +21,12 @@ public class Player : MonoBehaviour {
 	private float coolDown;
 	private RaycastHit hit;
 
+	private float alpha;
 	private float moveSpeed;
+	private SpriteRenderer sprite; 
 
-	void Start () {
+	void Start() {
+		alpha = 1f;
 		dead = false;
 		attacking = false;
 		coolDown = 0;
@@ -31,17 +34,18 @@ public class Player : MonoBehaviour {
 		renderer.castShadows = true;
 		renderer.receiveShadows = true;
 		rigidbody.velocity = Vector3.ClampMagnitude(rigidbody.velocity, 0.5f);
+		sprite = gameObject.GetComponent<SpriteRenderer>();
 	}
 	
-	void FixedUpdate () {
+	void FixedUpdate() {
 		float h = Input.GetAxis("Horizontal");
 
 		if (GameManager.levelCompleted) return;
 
 		if (h != 0) {
-				Move (h);
+			Move (h);
 		} else if (moveSpeed != 0) {
-				Move (moveSpeed);
+			Move (moveSpeed);
 		} else {
 			anim.SetBool("Walking", false);
 		}
@@ -51,7 +55,7 @@ public class Player : MonoBehaviour {
 		moveSpeed = s;
 	}
 
-	public void Move (float h) {
+	public void Move(float h) {
 		if (Mathf.Abs(h) > 0.01f) {
 			anim.SetBool("Walking", true);
 		}
@@ -99,10 +103,16 @@ public class Player : MonoBehaviour {
 		}
 	}
 
-	void Update () {
+	void Update() {
 		Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.down) * 0.4f, Color.green);
 		Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.right) * 0.1f, Color.red);
 		Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.left) * 0.1f, Color.blue);
+
+		if (alpha < 1f) {
+			Debug.Log("hi there");
+			alpha += Time.deltaTime * 2;
+			sprite.color = new Color(sprite.material.color.r, sprite.material.color.g, sprite.material.color.b, alpha);
+		}
 
 		if (GameManager.levelCompleted) return;
 		
@@ -212,5 +222,7 @@ public class Player : MonoBehaviour {
 		dead = false;
 		collider.enabled = true;
 		transform.position = new Vector3(lastCheckPoint.transform.position.x, lastCheckPoint.transform.position.y, transform.position.z);
+		alpha = 0f;
+		sprite.color = new Color(sprite.material.color.r, sprite.material.color.g, sprite.material.color.b, 0);
 	}
 }

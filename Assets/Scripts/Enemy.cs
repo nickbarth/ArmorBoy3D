@@ -22,7 +22,7 @@ public class Enemy : MonoBehaviour {
 
 	private SpriteRenderer sprite; 
 
-	void Start () {
+	void Start() {
 		fading = false;
 		sprite = gameObject.GetComponent<SpriteRenderer>();
 		alpha = 1f;
@@ -35,9 +35,9 @@ public class Enemy : MonoBehaviour {
 		}
 	}
 
-	void Update () {
+	void Update() {
 		if (fading) {
-			alpha -= Time.deltaTime;
+			alpha -= Time.deltaTime * 2;
 			sprite.color = new Color(sprite.material.color.r, sprite.material.color.g, sprite.material.color.b, alpha);
 			Respawn();
 		}
@@ -91,7 +91,7 @@ public class Enemy : MonoBehaviour {
 		}
 	}
 	
-	public void Kill () {
+	public void Kill() {
 		if (!dead) {
 			Object particles = Instantiate(DeathParticles, transform.position, Quaternion.identity);
 			Destroy(particles, 1f);
@@ -109,7 +109,7 @@ public class Enemy : MonoBehaviour {
 		yield return new WaitForSeconds(0.5f);
 	}
 	
-	public void Respawn () {
+	public void Respawn() {
 		if (alpha > 0f) {
 			fading = true;
 			return;

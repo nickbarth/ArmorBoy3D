@@ -42,7 +42,6 @@ public class Fallable : MonoBehaviour {
 		}
 	}
 
-	
 	void OnCollisionEnter(Collision collision) {
 		Fall();
 
@@ -59,7 +58,7 @@ public class Fallable : MonoBehaviour {
 		StartCoroutine(Respawn ());
 	}
 	
-	IEnumerator Respawn () {
+	IEnumerator Respawn() {
 		collider.enabled = false;
 		gameObject.renderer.enabled = false;
 		rigidbody.freezeRotation = true;
