@@ -2,6 +2,8 @@
 using System.Collections;
 
 public class Player : MonoBehaviour {
+	public enum Direction { Up, Down, Backward, Forward };
+	
 	public static bool attacking;
 	public static bool dead;
 	public static GameObject lastCheckPoint;
@@ -16,6 +18,7 @@ public class Player : MonoBehaviour {
 	private bool grounded;
 	private bool walledRight;
 	private bool walledLeft;
+	private bool bouncing;
 
 	private bool faceRight;
 	private float coolDown;
@@ -42,9 +45,9 @@ public class Player : MonoBehaviour {
 
 		if (GameManager.levelCompleted) return;
 
-		if (h != 0) {
+		if (h != 0 && !attacking) {
 			Move (h);
-		} else if (moveSpeed != 0) {
+		} else if (moveSpeed != 0 && !attacking) {
 			Move (moveSpeed);
 		} else {
 			anim.SetBool("Walking", false);
@@ -109,7 +112,6 @@ public class Player : MonoBehaviour {
 		Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.left) * 0.1f, Color.blue);
 
 		if (alpha < 1f) {
-			Debug.Log("hi there");
 			alpha += Time.deltaTime * 2;
 			sprite.color = new Color(sprite.material.color.r, sprite.material.color.g, sprite.material.color.b, alpha);
 		}
@@ -121,6 +123,10 @@ public class Player : MonoBehaviour {
 		walledLeft = Physics.Raycast(transform.position, Vector3.left, out hit, 0.2f, ~noEnemiesLayer);
 
 		grounded = Physics.Raycast(transform.position, Vector3.down, out hit, 0.4f, ~noEnemiesLayer); 
+		if (grounded) {
+			bouncing = false;
+		}
+		
 		if (grounded && hit.collider.gameObject.tag == "Fallable") {
 			hit.collider.gameObject.GetComponent<Fallable>().Fall();
 		}
@@ -152,7 +158,9 @@ public class Player : MonoBehaviour {
 		}
 		
 		if (coolDown >= 1.5f) {
-			rigidbody.velocity = new Vector3(0f, rigidbody.velocity.y, 0f);
+			if (attacking) {
+				rigidbody.velocity = new Vector3(rigidbody.velocity.x * 0.5f, rigidbody.velocity.y * 0.5f, 0f);
+			}
 			anim.SetBool("Attacking", false);
 			attacking = false;
 			GameManager.MakeBreakablesTrigger(false);
@@ -201,7 +209,16 @@ public class Player : MonoBehaviour {
 		}
 	}
 
-	void Kill() {
+	public void Bounce(Direction direction) {
+		if (bouncing) return;
+		bouncing = true;
+		
+		if (direction == Direction.Backward) {
+			rigidbody.velocity = new Vector3(faceRight ? -20f : 20f, 6f, 0f);
+		}
+	}
+	
+	public void Kill() {
 		Object particles = Instantiate(DeathParticles, transform.position, Quaternion.identity);
 		Destroy(particles, 1f);
 

@@ -79,6 +79,10 @@ public class Enemy : MonoBehaviour {
 		if (collider.gameObject.tag == "Player") {
 			Kill();
 		}
+			
+		if (collider.gameObject.tag == "Fallable") {
+			Kill();
+		}
 	}
 	
 	void OnCollisionEnter(Collision collision) {
@@ -88,6 +92,15 @@ public class Enemy : MonoBehaviour {
 
 		if (collision.gameObject.tag == "Player") {
 			Kill();
+		}
+		
+		if (collision.gameObject.tag == "Fallable") {
+			Kill();
+		}
+		
+		if (collision.gameObject.tag == "RoomEnd") {
+			goingForward = !goingForward;
+			transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y, transform.localScale.z);
 		}
 	}
 	
@@ -104,11 +117,6 @@ public class Enemy : MonoBehaviour {
 		}
 	}
 
-	IEnumerator Fade() {
-		Debug.Log ("Fading out");
-		yield return new WaitForSeconds(0.5f);
-	}
-	
 	public void Respawn() {
 		if (alpha > 0f) {
 			fading = true;

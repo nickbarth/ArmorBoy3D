@@ -12,12 +12,15 @@ public class Fallable : MonoBehaviour {
 	private Vector3 pos;
 	private Quaternion rot;
 	private Object explosion;
+	
+	private float delayTimer;
 
 	void Awake () {
 		if (delay == 0) {
 			delay = 2f;
 		}
 
+		delayTimer = 0f;
 		falling = false;
 		rigidbody.useGravity = false;
 		pos = transform.position;
@@ -25,8 +28,14 @@ public class Fallable : MonoBehaviour {
 	}
 
 	public void Update() {
-		if (constant && !falling) {
+		if (constant && !falling && delayTimer >= delay) {
 			Fall();
+		} else if (constant && !falling) {
+			delayTimer += Time.deltaTime;
+		}
+		
+		if (transform.position.y < 100) {
+			Respawn();
 		}
 	}
 
@@ -59,17 +68,18 @@ public class Fallable : MonoBehaviour {
 	}
 	
 	IEnumerator Respawn() {
+		rigidbody.useGravity = false;
 		collider.enabled = false;
 		gameObject.renderer.enabled = false;
 		rigidbody.freezeRotation = true;
 		transform.rotation = rot;
 		rigidbody.velocity = new Vector3(0f, 0f, 0f);
-		rigidbody.useGravity = false;
 		transform.position = pos;
 		yield return new WaitForSeconds(delay);	
 		rigidbody.freezeRotation = false;
 		gameObject.renderer.enabled = true;
 		collider.enabled = true;
 		falling = false;
+		delayTimer = 0f;
 	}
 }
