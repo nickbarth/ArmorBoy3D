@@ -214,7 +214,7 @@ public class Player : MonoBehaviour {
 		bouncing = true;
 		
 		if (direction == Direction.Backward) {
-			rigidbody.velocity = new Vector3(faceRight ? -20f : 20f, 6f, 0f);
+			rigidbody.velocity = new Vector3(faceRight ? -10f : 10f, 5f, 0f);
 		}
 	}
 	
