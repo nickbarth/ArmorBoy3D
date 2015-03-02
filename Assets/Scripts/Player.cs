@@ -8,7 +8,7 @@ public class Player : MonoBehaviour {
   public static bool Attacking { get; set; }
   public static bool Dead { get; set; }
 
-  // Configuration
+  // Config
   public GameObject DeathParticles;
   public GameObject SwordStrike;
 

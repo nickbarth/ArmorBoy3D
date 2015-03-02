@@ -1,140 +1,131 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 public class Enemy : MonoBehaviour {
-	public bool dead;
-	public GameObject DeathParticles;
-	public RaycastHit hit;
-	public bool forwardHit;
-	public bool backwardHit;
-	public bool goingForward;
-	public float moveSpeed;
+  public bool Dead { get; set; }
 
-	private bool hasGravity;
-	private Vector3 pos;
-	private Quaternion rot;
+  // Config
+  public GameObject DeathParticles;
+  public GameObject WaitObject;
+  public float MoveSpeed;
 
-	public GameObject WaitObject;
-	public Color myColor;
+  private Color myColor;
+  private Quaternion rot;
+  private RaycastHit hit;
+  private Vector3 pos;
+  private bool backwardHit;
+  private bool fadeOut;
+  private bool forwardHit;
+  private bool goingForward = true;
+  private bool hasGravity;
+  private float alpha = 1f;
 
-	public bool fading;
-	public float alpha;
+  private SpriteRenderer sprite; 
 
-	private SpriteRenderer sprite; 
+  void Start() {
+    sprite = gameObject.GetComponent<SpriteRenderer>();
+    hasGravity = rigidbody.useGravity;
+    pos = transform.position;
+    rot = transform.rotation;
+    MoveSpeed = MoveSpeed.Equals(0f) ? 0.03f : MoveSpeed;
+  }
 
-	void Start() {
-		fading = false;
-		sprite = gameObject.GetComponent<SpriteRenderer>();
-		alpha = 1f;
-		hasGravity = rigidbody.useGravity;
-		pos = transform.position;
-		rot = transform.rotation;
-		goingForward = true;
-		if (moveSpeed == 0) {
-			moveSpeed = 0.03f;
-		}
-	}
+  void Update() {
+    Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.down) * 0.4f, Color.green);
+    Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.right) * 0.4f, Color.red);
+    Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.left) * 0.4f, Color.blue);
 
-	void Update() {
-		if (fading) {
-			alpha -= Time.deltaTime * 2;
-			sprite.color = new Color(sprite.material.color.r, sprite.material.color.g, sprite.material.color.b, alpha);
-			Respawn();
-		}
+    if (fadeOut) {
+      alpha -= Time.deltaTime * 2;
+      sprite.color = new Color(sprite.material.color.r, sprite.material.color.g, sprite.material.color.b, alpha);
+      Respawn();
+    } else if (alpha < 1f) {
+      alpha += Time.deltaTime;
+      sprite.color = new Color(sprite.material.color.r, sprite.material.color.g, sprite.material.color.b, alpha);
+    }
 
-		if (!fading && alpha < 1f) {
-			alpha += Time.deltaTime;
-			sprite.color = new Color(sprite.material.color.r, sprite.material.color.g, sprite.material.color.b, alpha);
-		}
+    if (Dead) return;
+    if (WaitObject != null && WaitObject.activeSelf) return;
 
-		if (dead) return;
-		if (WaitObject != null && WaitObject.activeSelf) return;
+    const int noEnemiesLayer = 1 << 8;
 
-		Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.down) * 0.4f, Color.green);
-		Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.right) * 0.4f, Color.red);
-		Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.left) * 0.4f, Color.blue);
+    backwardHit = Physics.Raycast(transform.position, Vector3.right, out hit, 0.4f, ~noEnemiesLayer);
+    forwardHit = Physics.Raycast(transform.position, Vector3.left, out hit, 0.4f, ~noEnemiesLayer);
 
-		int noEnemiesLayer = 1 << 8;
-		
-		backwardHit = Physics.Raycast(transform.position, Vector3.right, out hit, 0.4f, ~noEnemiesLayer);
-		forwardHit = Physics.Raycast(transform.position, Vector3.left, out hit, 0.4f, ~noEnemiesLayer);
+    if ((goingForward && forwardHit) || (!goingForward && backwardHit)) {
+      goingForward = !goingForward;
+      transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y, transform.localScale.z);
+    }
 
-		if ((goingForward && forwardHit) || (!goingForward && backwardHit)) {
-			goingForward = !goingForward;
-			transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y, transform.localScale.z);
-		}
+    if (goingForward) { 
+      transform.Translate (Vector3.right * MoveSpeed);
+    } else {
+      transform.Translate (Vector3.left * MoveSpeed);
+    }
+  }
 
-		if (goingForward) { 
-			transform.Translate (Vector3.right * moveSpeed);
-		} else {
-			transform.Translate (Vector3.left * moveSpeed);
-		}
-	}
+  void OnTriggerEnter(Component component) {
+    if (component.gameObject.tag == "BadTouch") {
+      Kill();
+    }
 
-	void OnTriggerEnter(Collider collider) {
-		if (collider.gameObject.tag == "BadTouch") {
-			Kill();
-		}
+    if (component.gameObject.tag == "Player") {
+      Kill();
+    }
 
-		if (collider.gameObject.tag == "Player") {
-			Kill();
-		}
-			
-		if (collider.gameObject.tag == "Fallable") {
-			Kill();
-		}
-	}
-	
-	void OnCollisionEnter(Collision collision) {
-		if (collision.gameObject.tag == "BadTouch") {
-			Kill();
-		}
+    if (component.gameObject.tag == "Fallable") {
+      Kill();
+    }
+  }
 
-		if (collision.gameObject.tag == "Player") {
-			Kill();
-		}
-		
-		if (collision.gameObject.tag == "Fallable") {
-			Kill();
-		}
-		
-		if (collision.gameObject.tag == "RoomEnd") {
-			goingForward = !goingForward;
-			transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y, transform.localScale.z);
-		}
-	}
-	
-	public void Kill() {
-		if (!dead) {
-			Object particles = Instantiate(DeathParticles, transform.position, Quaternion.identity);
-			Destroy(particles, 1f);
+  void OnCollisionEnter(Component component) {
+    if (component.gameObject.tag == "BadTouch") {
+      Kill();
+    }
 
-			collider.enabled = false;
-			gameObject.renderer.enabled = false;
-			rigidbody.useGravity = false;
-			rigidbody.velocity = new Vector3(0f, 0f, 0f);
-			dead = true;
-		}
-	}
+    if (component.gameObject.tag == "Player") {
+      Kill();
+    }
 
-	public void Respawn() {
-		if (alpha > 0f) {
-			fading = true;
-			return;
-		}
+    if (component.gameObject.tag == "Fallable") {
+      Kill();
+    }
 
-		goingForward = true;
-		transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
-		transform.rotation = rot;
-		transform.position = pos;
-		gameObject.renderer.enabled = true;
-		collider.enabled = true;
-		goingForward = true;
-		if (hasGravity) {
-			rigidbody.useGravity = true;
-		}
-		sprite.color = new Color(sprite.material.color.r, sprite.material.color.g, sprite.material.color.b, 1f);
-		dead = false;
-		fading = false;
-	}
+    if (component.gameObject.tag == "RoomEnd") {
+      goingForward = !goingForward;
+      transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y, transform.localScale.z);
+    }
+  }
+
+  public void Kill() {
+    if (!Dead) {
+      Object particles = Instantiate(DeathParticles, transform.position, Quaternion.identity);
+      Destroy(particles, 1f);
+
+      collider.enabled = false;
+      gameObject.renderer.enabled = false;
+      rigidbody.useGravity = false;
+      rigidbody.velocity = new Vector3(0f, 0f, 0f);
+      Dead = true;
+    }
+  }
+
+  public void Respawn() {
+    if (alpha > 0f) {
+      fadeOut = true;
+      return;
+    }
+
+    sprite.color = new Color(sprite.material.color.r, sprite.material.color.g, sprite.material.color.b, 1f);
+    transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
+    transform.position = pos;
+    transform.rotation = rot;
+
+    Dead = false;
+    collider.enabled = true;
+    fadeOut = false;
+    gameObject.renderer.enabled = true;
+    goingForward = true;
+    goingForward = true;
+    rigidbody.useGravity = hasGravity;
+  }
 }
