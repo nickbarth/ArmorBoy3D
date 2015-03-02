@@ -13,11 +13,11 @@ public class MobileControls : MonoBehaviour, IPointerDownHandler, IPointerUpHand
 	public void OnPointerDown(PointerEventData data)
 	{	
 		if (gameObject.name == "LeftButton") {
-			player.MoveSpeed(-1f);
+			player.MoveSpeed = -1f;
 		}
 		
 		if (gameObject.name == "RightButton") {
-			player.MoveSpeed(1f);
+			player.MoveSpeed  = 1f;
 		}
 
 		if (gameObject.name == "JumpButton") {
@@ -32,11 +32,11 @@ public class MobileControls : MonoBehaviour, IPointerDownHandler, IPointerUpHand
 	public void OnPointerUp(PointerEventData eventData)
 	{
 		if (gameObject.name == "LeftButton") {
-			player.MoveSpeed(0f);
+			player.MoveSpeed = 0f;
 		}
 		
 		if (gameObject.name == "RightButton") {
-			player.MoveSpeed(0f);
+			player.MoveSpeed = 0f;
 		}
 	}
 }

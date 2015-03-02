@@ -11,7 +11,7 @@ public class Breakable : MonoBehaviour {
 	}
 
 	void OnTriggerEnter(Collider collider) {
-		if (collider.gameObject.tag == "Player" && Player.attacking) {
+		if (collider.gameObject.tag == "Player" && Player.Attacking) {
 			Break();
 		}
 	}
