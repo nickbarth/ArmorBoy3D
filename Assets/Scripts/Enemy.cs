@@ -75,6 +75,11 @@ public class Enemy : MonoBehaviour, IRespawnable {
     if (component.gameObject.tag == "Fallable") {
       Kill();
     }
+
+    if (component.gameObject.tag == "RoomEnd") {
+      goingForward = !goingForward;
+      transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y, transform.localScale.z);
+    }
   }
 
   void OnCollisionEnter(Collision component) {
