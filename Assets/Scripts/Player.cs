@@ -5,6 +5,8 @@ public class Player : MonoBehaviour {
   public enum Direction { Up, Down, Backward, Forward };
 
   public static GameObject LastCheckPoint { get; set; } 
+  public static GameObject Body { get; set; }
+  public static Player Actions { get; set; }
   public static bool Attacking { get; set; }
   public static bool Dead { get; set; }
 
@@ -19,16 +21,18 @@ public class Player : MonoBehaviour {
   private SpriteRenderer sprite;
   private Animator anim;
   private bool bouncing;
-  private bool faceRight = true;
+  private bool faceForward = true;
   private bool grounded;
-  private bool walledLeft;
-  private bool walledRight;
+  private bool openBackward;
+  private bool openForward;
   private float alpha = 1f;
   private float coolDown;
 
   void Start() {
     Player.Dead = false;
     Player.Attacking = false;
+    Player.Actions = gameObject.GetComponent<Player>();
+    Player.Body = gameObject;
 
     renderer.castShadows = true;
     renderer.receiveShadows = true;
@@ -41,7 +45,7 @@ public class Player : MonoBehaviour {
   void FixedUpdate() {
     float axis = Input.GetAxis("Horizontal");
 
-    if (GameManager.levelCompleted) return;
+    if (GameManager.LevelCompleted) return;
 
     if (!axis.Equals(0f) && !Player.Attacking) {
       Move (axis);
@@ -62,12 +66,11 @@ public class Player : MonoBehaviour {
       sprite.color = new Color(sprite.material.color.r, sprite.material.color.g, sprite.material.color.b, alpha);
     }
 
-    if (GameManager.levelCompleted) return;
+    if (GameManager.LevelCompleted) return;
 
     const int noEnemiesLayer = 1 << 8;
-    walledRight = Physics.Raycast(transform.position, Vector3.right, out hit, 0.2f, ~noEnemiesLayer);
-    walledLeft = Physics.Raycast(transform.position, Vector3.left, out hit, 0.2f, ~noEnemiesLayer);
-
+    openForward = Physics.Raycast(transform.position, Vector3.right, out hit, 0.2f, ~noEnemiesLayer);
+    openBackward = Physics.Raycast(transform.position, Vector3.left, out hit, 0.2f, ~noEnemiesLayer);
     grounded = Physics.Raycast(transform.position, Vector3.down, out hit, 0.4f, ~noEnemiesLayer); 
 
     if (grounded && bouncing) {
@@ -79,16 +82,16 @@ public class Player : MonoBehaviour {
     }
 
     if (swordTrail) {
-      var pos = new Vector3(transform.position.x + (faceRight ? 0.4f : -0.4f), transform.position.y, transform.position.z);
+      var pos = new Vector3(transform.position.x + (faceForward ? 0.4f : -0.4f), transform.position.y, transform.position.z);
       swordTrail.transform.position = pos;
-      swordTrail.transform.rotation = Quaternion.Euler(0, (faceRight ? -90f : 90f), 0);
+      swordTrail.transform.rotation = Quaternion.Euler(0, (faceForward ? -90f : 90f), 0);
     }
 
-    if (Attacking && !faceRight & walledLeft) {
+    if (Attacking && !faceForward & openBackward) {
       rigidbody.velocity = new Vector3(3f, -2f, 0f);
     }
 
-    if (Attacking && faceRight & walledRight) {
+    if (Attacking && faceForward & openForward) {
       rigidbody.velocity = new Vector3(-3f, -2f, 0f);
     }
 
@@ -124,12 +127,12 @@ public class Player : MonoBehaviour {
       anim.SetBool("Walking", true);
     }
 
-    if ((!walledRight && h > 0 || !walledLeft && h < 0) && !Player.Dead) {
+    if ((!openForward && h > 0 || !openBackward && h < 0) && !Player.Dead) {
       transform.Translate(new Vector3(h * 0.1f, 0, 0));
     }
 
-    if (h < -0.01f && faceRight || h > 0.01f && !faceRight) {
-      faceRight = !faceRight;
+    if (h < -0.01f && faceForward || h > 0.01f && !faceForward) {
+      faceForward = !faceForward;
       transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y, transform.localScale.z);
     }
   }
@@ -148,57 +151,57 @@ public class Player : MonoBehaviour {
       GameManager.MakeBreakablesTrigger();
 
       const int noEnemiesLayer = 1 << 8;
-      walledRight = Physics.Raycast(transform.position, Vector3.right, out hit, 0.2f, ~noEnemiesLayer);
-      walledLeft = Physics.Raycast(transform.position, Vector3.left, out hit, 0.2f, ~noEnemiesLayer);
+      openForward = Physics.Raycast(transform.position, Vector3.right, out hit, 0.2f, ~noEnemiesLayer);
+      openBackward = Physics.Raycast(transform.position, Vector3.left, out hit, 0.2f, ~noEnemiesLayer);
 
-      if (Attacking && !faceRight & walledLeft) {
+      if (Attacking && !faceForward & openBackward) {
         rigidbody.velocity = new Vector3(3f, -2f, 0f);
-      } else if (Attacking && faceRight & walledRight) {
+      } else if (Attacking && faceForward & openForward) {
         rigidbody.velocity = new Vector3(-3f, -2f, 0f);
       } else {
-        rigidbody.velocity = new Vector3(faceRight ? 10.0f : -10.0f, 0f, 0f);
+        rigidbody.velocity = new Vector3(faceForward ? 10.0f : -10.0f, 0f, 0f);
       }
 
       coolDown = 1f;
 
-      var pos = new Vector3(transform.position.x + (faceRight ? 0.4f : -0.4f), transform.position.y, transform.position.z);
-      swordTrail = Instantiate(SwordStrike, pos, Quaternion.Euler(0, (faceRight ? -90f : 90f), 0)) as GameObject;
+      var pos = new Vector3(transform.position.x + (faceForward ? 0.4f : -0.4f), transform.position.y, transform.position.z);
+      swordTrail = Instantiate(SwordStrike, pos, Quaternion.Euler(0, (faceForward ? -90f : 90f), 0)) as GameObject;
       Destroy(swordTrail, 1f);
     }
   }
 
-  void OnCollisionEnter(Collision collision) {
-    if (collision.gameObject.tag == "BadTouch") {
+  void OnCollisionEnter(Collision component) {
+    if (component.gameObject.tag == "BadTouch") {
       Kill();
     }
 
-    if (collision.gameObject.tag == "Enemy" && !Attacking) {
-      Kill();
-    }
-  }
-
-  void OnTriggerEnter(Component collider) {
-    if (collider.gameObject.tag == "CheckPoint") {
-      LastCheckPoint = collider.gameObject;
-      collider.gameObject.SetActive(false);
-    }
-
-    if (collider.gameObject.tag == "BadTouch" || (collider.gameObject.tag == "Enemy" && !Attacking)) {
+    if (component.gameObject.tag == "Enemy" && !Attacking) {
       Kill();
     }
   }
 
-  void OnTriggerStay(Component collider) {
-    if (collider.gameObject.tag == "LevelPoint") {
-      GameManager.levelCompleted = true;
+  void OnTriggerEnter(Component component) {
+    if (component.gameObject.tag == "CheckPoint") {
+      LastCheckPoint = component.gameObject;
+      component.gameObject.SetActive(false);
+    }
+
+    if (component.gameObject.tag == "BadTouch" || (component.gameObject.tag == "Enemy" && !Attacking)) {
+      Kill();
+    }
+  }
+
+  void OnTriggerStay(Component component) {
+    if (component.gameObject.tag == "LevelPoint") {
+      GameManager.LevelCompleted = true;
 
       anim.SetBool("Attacking", false);
       anim.SetBool("Walking", true);
 
-      if (transform.position.x < collider.gameObject.transform.position.x) {
+      if (transform.position.x < component.gameObject.transform.position.x) {
         rigidbody.velocity = new Vector3(0f, 1f, 0f);
         float step = 2f * Time.deltaTime;
-        transform.position = Vector3.MoveTowards(transform.position, collider.gameObject.transform.position, step);
+        transform.position = Vector3.MoveTowards(transform.position, component.gameObject.transform.position, step);
       } else {
         rigidbody.velocity = new Vector3(0f, 5f, 0f);
       }
@@ -210,7 +213,7 @@ public class Player : MonoBehaviour {
     bouncing = true;
 
     if (direction == Direction.Backward) {
-      rigidbody.velocity = new Vector3(faceRight ? -10f : 10f, 5f, 0f);
+      rigidbody.velocity = new Vector3(faceForward ? -10f : 10f, 5f, 0f);
     }
   }
 

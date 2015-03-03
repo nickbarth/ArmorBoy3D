@@ -3,40 +3,33 @@ using UnityEngine.EventSystems;
 
 public class MobileControls : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 {
-	Player player;
+  public void OnPointerDown(PointerEventData data)
+  { 
+    if (gameObject.name == "LeftButton") {
+      GameManager.Player.MoveSpeed = -1f;
+    }
 
-	void Awake() {
-		GameObject armorBoy = GameObject.Find("ArmorBoy");
-		player = armorBoy.GetComponent<Player>();
-	}
+    if (gameObject.name == "RightButton") {
+      GameManager.Player.MoveSpeed  = 1f;
+    }
 
-	public void OnPointerDown(PointerEventData data)
-	{	
-		if (gameObject.name == "LeftButton") {
-			player.MoveSpeed = -1f;
-		}
-		
-		if (gameObject.name == "RightButton") {
-			player.MoveSpeed  = 1f;
-		}
+    if (gameObject.name == "JumpButton") {
+      GameManager.Player.Jump();
+    }
 
-		if (gameObject.name == "JumpButton") {
-			player.Jump();
-		}
+    if (gameObject.name == "AttackButton") {
+      GameManager.Player.Attack();
+    }
+  }
 
-		if (gameObject.name == "AttackButton") {
-			player.Attack();
-		}
-	}
+  public void OnPointerUp(PointerEventData eventData)
+  {
+    if (gameObject.name == "LeftButton") {
+      GameManager.Player.MoveSpeed = 0f;
+    }
 
-	public void OnPointerUp(PointerEventData eventData)
-	{
-		if (gameObject.name == "LeftButton") {
-			player.MoveSpeed = 0f;
-		}
-		
-		if (gameObject.name == "RightButton") {
-			player.MoveSpeed = 0f;
-		}
-	}
+    if (gameObject.name == "RightButton") {
+      GameManager.Player.MoveSpeed = 0f;
+    }
+  }
 }

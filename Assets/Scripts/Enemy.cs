@@ -77,7 +77,7 @@ public class Enemy : MonoBehaviour {
     }
   }
 
-  void OnCollisionEnter(Component component) {
+  void OnCollisionEnter(Collision component) {
     if (component.gameObject.tag == "BadTouch") {
       Kill();
     }
