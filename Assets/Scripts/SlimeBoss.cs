@@ -1,9 +1,10 @@
 ﻿using UnityEngine;
 
-public class SlimeBoss : MonoBehaviour {
+public class SlimeBoss : MonoBehaviour, IRespawnable {
   public bool Dead { get; set; }
 
   // Config
+  public GameObject Teleporter;
   public GameObject DeathParticles;
   public int Lives;
 
@@ -11,6 +12,14 @@ public class SlimeBoss : MonoBehaviour {
   private bool faceForward = true;
   private bool grounded = true;
   private bool waiting = true;
+
+  private Vector3 _pos;
+  private Vector3 _scale;
+
+  void Start() {
+    _pos = transform.position;
+    _scale = gameObject.transform.localScale;
+  }
 
   void Update() {
     timer += Time.deltaTime;
@@ -61,6 +70,8 @@ public class SlimeBoss : MonoBehaviour {
 
   public void Kill() {
     if (!Dead) {
+      Teleporter.gameObject.transform.position = gameObject.transform.position;
+
       Object particles = Instantiate(DeathParticles, transform.position, Quaternion.identity);
       Destroy(particles, 1f);
       Destroy(gameObject);
@@ -80,5 +91,12 @@ public class SlimeBoss : MonoBehaviour {
 
     Object particles = Instantiate(DeathParticles, injury, Quaternion.identity);
     Destroy(particles, 1f);
+  }
+
+  public void Respawn() {
+    waiting = true;
+    gameObject.transform.localScale = _scale;
+    transform.position = _pos;
+    Lives = 12;
   }
 }
