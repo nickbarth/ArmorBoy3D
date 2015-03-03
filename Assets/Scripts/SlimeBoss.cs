@@ -72,8 +72,9 @@ public class SlimeBoss : MonoBehaviour {
     var pos = Player.Body.transform.position;
     var injury = new Vector3(pos.x, pos.y, pos.z);
 
+    float factor = 1.1f;
     var scale = gameObject.transform.localScale;
-    gameObject.transform.localScale = new Vector3(scale.x / 1.5f, scale.y / 1.5f, scale.z / 1.5f);
+    gameObject.transform.localScale = new Vector3(scale.x / factor, scale.y / factor, scale.z / factor);
 
     Player.Actions.Bounce(Player.Direction.Backward);
 
