@@ -197,6 +197,10 @@ public class Player : MonoBehaviour {
       component.gameObject.SetActive(false);
     }
 
+    if (component.CompareTag("ActionPoint")) {
+      component.gameObject.SetActive(false);
+    }
+
     if (component.CompareTag("BadTouch") || (component.CompareTag("Enemy") && !Attacking)) {
       Kill();
     }
@@ -234,6 +238,7 @@ public class Player : MonoBehaviour {
 
     if (direction == Direction.Backward) {
       GetComponent<Rigidbody>().velocity = new Vector3(faceForward ? -10f : 10f, 5f, 0f);
+      GetComponent<Collider>().isTrigger = false;
     }
   }
 

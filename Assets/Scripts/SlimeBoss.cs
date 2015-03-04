@@ -15,6 +15,7 @@ public class SlimeBoss : MonoBehaviour, IRespawnable {
 
   private Vector3 _pos;
   private Vector3 _scale;
+  private bool reset;
 
   void Start() {
     _pos = transform.position;
@@ -24,8 +25,13 @@ public class SlimeBoss : MonoBehaviour, IRespawnable {
   void Update() {
     timer += Time.deltaTime;
 
+    if (reset && timer > 1f) {
+      Respawn();
+      reset = false;
+    }
+
     if (waiting && timer >= 2f) {
-      GetComponent<Rigidbody>().velocity = new Vector3(0f, 1f, 1f);
+      GetComponent<Rigidbody>().velocity = new Vector3(0f, 2f, 0f);
       timer = 0;
       return;
     }
@@ -47,10 +53,7 @@ public class SlimeBoss : MonoBehaviour, IRespawnable {
 
   void OnTriggerEnter(Component component) {
     if (component.gameObject.tag == "Player" && Player.Attacking) {
-      Lives -= 1;
-
-      if (Lives <= 0) Kill();
-      else Injure();
+      Injure();
 
       waiting = false;
     } else if (component.gameObject.tag == "Player") {
@@ -83,6 +86,8 @@ public class SlimeBoss : MonoBehaviour, IRespawnable {
     var pos = Player.Body.transform.position;
     var injury = new Vector3(pos.x, pos.y, pos.z);
 
+    Lives -= 1;
+
     float factor = 1.1f;
     var scale = gameObject.transform.localScale;
     gameObject.transform.localScale = new Vector3(scale.x / factor, scale.y / factor, scale.z / factor);
@@ -91,9 +96,17 @@ public class SlimeBoss : MonoBehaviour, IRespawnable {
 
     Object particles = Instantiate(DeathParticles, injury, Quaternion.identity);
     Destroy(particles, 1f);
+
+    if (Lives <= 0) Kill();
   }
 
   public void Respawn() {
+    if (!reset) {
+      timer = 0f;
+      reset = true;
+      return;
+    }
+
     waiting = true;
     gameObject.transform.localScale = _scale;
     transform.position = _pos;
