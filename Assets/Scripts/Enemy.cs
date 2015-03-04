@@ -23,7 +23,7 @@ public class Enemy : MonoBehaviour, IRespawnable {
 
   void Start() {
     sprite = gameObject.GetComponent<SpriteRenderer>();
-    hasGravity = rigidbody.useGravity;
+    hasGravity = GetComponent<Rigidbody>().useGravity;
     pos = transform.position;
     rot = transform.rotation;
     MoveSpeed = MoveSpeed.Equals(0f) ? 0.03f : MoveSpeed;
@@ -106,10 +106,10 @@ public class Enemy : MonoBehaviour, IRespawnable {
       Object particles = Instantiate(DeathParticles, transform.position, Quaternion.identity);
       Destroy(particles, 1f);
 
-      collider.enabled = false;
-      gameObject.renderer.enabled = false;
-      rigidbody.useGravity = false;
-      rigidbody.velocity = new Vector3(0f, 0f, 0f);
+      GetComponent<Collider>().enabled = false;
+      gameObject.GetComponent<Renderer>().enabled = false;
+      GetComponent<Rigidbody>().useGravity = false;
+      GetComponent<Rigidbody>().velocity = new Vector3(0f, 0f, 0f);
       Dead = true;
     }
   }
@@ -126,11 +126,11 @@ public class Enemy : MonoBehaviour, IRespawnable {
     transform.rotation = rot;
 
     Dead = false;
-    collider.enabled = true;
+    GetComponent<Collider>().enabled = true;
     fadeOut = false;
-    gameObject.renderer.enabled = true;
+    gameObject.GetComponent<Renderer>().enabled = true;
     goingForward = true;
     goingForward = true;
-    rigidbody.useGravity = hasGravity;
+    GetComponent<Rigidbody>().useGravity = hasGravity;
   }
 }

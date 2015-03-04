@@ -25,14 +25,14 @@ public class SlimeBoss : MonoBehaviour, IRespawnable {
     timer += Time.deltaTime;
 
     if (waiting && timer >= 2f) {
-      rigidbody.velocity = new Vector3(0f, 1f, 1f);
+      GetComponent<Rigidbody>().velocity = new Vector3(0f, 1f, 1f);
       timer = 0;
       return;
     }
 
     if (timer >= 2f) {
       grounded = false;
-      rigidbody.velocity = new Vector3(faceForward ? -5f : 5f, 7f, 1f);
+      GetComponent<Rigidbody>().velocity = new Vector3(faceForward ? -5f : 5f, 7f, 1f);
       timer = 0;
     }
 

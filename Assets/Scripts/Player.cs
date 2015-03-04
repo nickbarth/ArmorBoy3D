@@ -34,10 +34,7 @@ public class Player : MonoBehaviour {
     Player.Actions = gameObject.GetComponent<Player>();
     Player.Body = gameObject;
 
-    renderer.castShadows = true;
-    renderer.receiveShadows = true;
-
-    rigidbody.velocity = Vector3.ClampMagnitude(rigidbody.velocity, 0.5f);
+    GetComponent<Rigidbody>().velocity = Vector3.ClampMagnitude(GetComponent<Rigidbody>().velocity, 0.5f);
     sprite = gameObject.GetComponent<SpriteRenderer>();
     anim = gameObject.GetComponent<Animator>();
   }
@@ -73,6 +70,10 @@ public class Player : MonoBehaviour {
     openBackward = Physics.Raycast(transform.position, Vector3.left, out hit, 0.2f, ~noEnemiesLayer);
     grounded = Physics.Raycast(transform.position, Vector3.down, out hit, 0.4f, ~noEnemiesLayer); 
 
+    if (grounded || transform.position.y < 0.6f) {
+      GetComponent<Collider>().isTrigger = false;
+    }
+
     if (grounded && bouncing) {
       bouncing = false;
     }
@@ -88,11 +89,11 @@ public class Player : MonoBehaviour {
     }
 
     if (Attacking && !faceForward & openBackward) {
-      rigidbody.velocity = new Vector3(3f, -2f, 0f);
+      GetComponent<Rigidbody>().velocity = new Vector3(3f, -2f, 0f);
     }
 
     if (Attacking && faceForward & openForward) {
-      rigidbody.velocity = new Vector3(-3f, -2f, 0f);
+      GetComponent<Rigidbody>().velocity = new Vector3(-3f, -2f, 0f);
     }
 
     if (Input.GetKey(KeyCode.UpArrow)) {
@@ -109,7 +110,7 @@ public class Player : MonoBehaviour {
 
     if (coolDown >= 1.5f) {
       if (Attacking) {
-        rigidbody.velocity = new Vector3(rigidbody.velocity.x * 0.5f, rigidbody.velocity.y * 0.5f, 0f);
+        GetComponent<Rigidbody>().velocity = new Vector3(GetComponent<Rigidbody>().velocity.x * 0.5f, GetComponent<Rigidbody>().velocity.y * 0.5f, 0f);
       }
 
       anim.SetBool("Attacking", false);
@@ -139,7 +140,8 @@ public class Player : MonoBehaviour {
 
   public void Jump () {
     if (grounded) {
-      rigidbody.velocity = new Vector3(0f, 5.0f, 0f);
+      GetComponent<Rigidbody>().velocity = new Vector3(0f, 5.0f, 0f);
+      GetComponent<Collider>().isTrigger = true;
     }
   }
 
@@ -155,11 +157,11 @@ public class Player : MonoBehaviour {
       openBackward = Physics.Raycast(transform.position, Vector3.left, out hit, 0.2f, ~noEnemiesLayer);
 
       if (Attacking && !faceForward & openBackward) {
-        rigidbody.velocity = new Vector3(3f, -2f, 0f);
+        GetComponent<Rigidbody>().velocity = new Vector3(3f, -2f, 0f);
       } else if (Attacking && faceForward & openForward) {
-        rigidbody.velocity = new Vector3(-3f, -2f, 0f);
+        GetComponent<Rigidbody>().velocity = new Vector3(-3f, -2f, 0f);
       } else {
-        rigidbody.velocity = new Vector3(faceForward ? 10.0f : -10.0f, 0f, 0f);
+        GetComponent<Rigidbody>().velocity = new Vector3(faceForward ? 10.0f : -10.0f, 0f, 0f);
       }
 
       coolDown = 1f;
@@ -199,11 +201,11 @@ public class Player : MonoBehaviour {
       anim.SetBool("Walking", true);
 
       if (transform.position.x < component.gameObject.transform.position.x) {
-        rigidbody.velocity = new Vector3(0f, 1f, 0f);
+        GetComponent<Rigidbody>().velocity = new Vector3(0f, 1f, 0f);
         float step = 2f * Time.deltaTime;
         transform.position = Vector3.MoveTowards(transform.position, component.gameObject.transform.position, step);
       } else {
-        rigidbody.velocity = new Vector3(0f, 5f, 0f);
+        GetComponent<Rigidbody>().velocity = new Vector3(0f, 5f, 0f);
       }
     }
   }
@@ -213,7 +215,7 @@ public class Player : MonoBehaviour {
     bouncing = true;
 
     if (direction == Direction.Backward) {
-      rigidbody.velocity = new Vector3(faceForward ? -10f : 10f, 5f, 0f);
+      GetComponent<Rigidbody>().velocity = new Vector3(faceForward ? -10f : 10f, 5f, 0f);
     }
   }
 
@@ -221,7 +223,7 @@ public class Player : MonoBehaviour {
     Object particles = Instantiate(DeathParticles, transform.position, Quaternion.identity);
     Destroy(particles, 1f);
 
-    rigidbody.velocity = new Vector3(0f, 0f, 0f);
+    GetComponent<Rigidbody>().velocity = new Vector3(0f, 0f, 0f);
 
     if (!Player.Dead) {
       StartCoroutine(Respawn());
@@ -230,17 +232,17 @@ public class Player : MonoBehaviour {
 
   IEnumerator Respawn () {
     Player.Dead = true;
-    collider.enabled = false;
-    gameObject.renderer.enabled = false;
+    GetComponent<Collider>().enabled = false;
+    gameObject.GetComponent<Renderer>().enabled = false;
     LastCheckPoint.gameObject.GetComponent<CheckPoint>().Respawn();
 
     yield return new WaitForSeconds(1);
 
     alpha = 0f;
     Player.Dead = false;
-    collider.enabled = true;
+    GetComponent<Collider>().enabled = true;
     transform.position = new Vector3(Player.LastCheckPoint.transform.position.x, Player.LastCheckPoint.transform.position.y, transform.position.z);
     sprite.color = new Color(sprite.material.color.r, sprite.material.color.g, sprite.material.color.b, 0);
-    gameObject.renderer.enabled = true;
+    gameObject.GetComponent<Renderer>().enabled = true;
   }
 }

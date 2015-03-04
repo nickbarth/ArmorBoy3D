@@ -22,7 +22,7 @@ public class Fallable : MonoBehaviour {
 
 		delayTimer = 0f;
 		falling = false;
-		rigidbody.useGravity = false;
+		GetComponent<Rigidbody>().useGravity = false;
 		pos = transform.position;
 		rot = transform.rotation;
 	}
@@ -42,7 +42,7 @@ public class Fallable : MonoBehaviour {
 	public void Fall() {
 		if (waitObject != null && waitObject.activeSelf) return;
 		falling = true;
-		rigidbody.useGravity = true;
+		GetComponent<Rigidbody>().useGravity = true;
 	}
 	
 	void OnTriggerEnter(Collider collider) {
@@ -68,17 +68,17 @@ public class Fallable : MonoBehaviour {
 	}
 	
 	IEnumerator Respawn() {
-		rigidbody.useGravity = false;
-		collider.enabled = false;
-		gameObject.renderer.enabled = false;
-		rigidbody.freezeRotation = true;
+		GetComponent<Rigidbody>().useGravity = false;
+		GetComponent<Collider>().enabled = false;
+		gameObject.GetComponent<Renderer>().enabled = false;
+		GetComponent<Rigidbody>().freezeRotation = true;
 		transform.rotation = rot;
-		rigidbody.velocity = new Vector3(0f, 0f, 0f);
+		GetComponent<Rigidbody>().velocity = new Vector3(0f, 0f, 0f);
 		transform.position = pos;
 		yield return new WaitForSeconds(delay);	
-		rigidbody.freezeRotation = false;
-		gameObject.renderer.enabled = true;
-		collider.enabled = true;
+		GetComponent<Rigidbody>().freezeRotation = false;
+		gameObject.GetComponent<Renderer>().enabled = true;
+		GetComponent<Collider>().enabled = true;
 		falling = false;
 		delayTimer = 0f;
 	}
