@@ -120,17 +120,17 @@ public class Enemy : MonoBehaviour, IRespawnable {
       return;
     }
 
-    sprite.color = new Color(sprite.material.color.r, sprite.material.color.g, sprite.material.color.b, 1f);
+    sprite.color = new Color(sprite.material.color.r, sprite.material.color.g, sprite.material.color.b, 0f);
     transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
     transform.position = pos;
     transform.rotation = rot;
 
     Dead = false;
-    GetComponent<Collider>().enabled = true;
     fadeOut = false;
-    gameObject.GetComponent<Renderer>().enabled = true;
     goingForward = true;
     goingForward = true;
     GetComponent<Rigidbody>().useGravity = hasGravity;
+    GetComponent<Renderer>().enabled = true;
+    GetComponent<Collider>().enabled = true;
   }
 }

@@ -1,18 +1,18 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 public class Breakable : MonoBehaviour {
-	public GameObject pieces;
+  // Config
+  public GameObject Pieces;
 
-	public void Break () {
-		Object explosion = Instantiate(pieces, transform.position, Quaternion.identity);
-		Destroy(gameObject);
-		Destroy(explosion, 1f);
-	}
+  public void Break () {
+    Object explosion = Instantiate(Pieces, transform.position, Quaternion.identity);
+    Destroy(gameObject);
+    Destroy(explosion, 1f);
+  }
 
-	void OnTriggerEnter(Collider collider) {
-		if (collider.gameObject.tag == "Player" && Player.Attacking) {
-			Break();
-		}
-	}
+  void OnTriggerEnter(Component component) {
+    if (component.CompareTag("Player") && Player.Attacking) {
+      Break();
+    }
+  }
 }

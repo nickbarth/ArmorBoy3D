@@ -11,7 +11,12 @@ public class GameManager : MonoBehaviour {
   public string NextLevel;
 
   void Awake() {
-    #if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WEBPLAYER
+    #if UNITY_IOS || UNITY_ANDROID
+    GameObject.Find("LeftButton").SetActive(true);
+    GameObject.Find("RightButton").SetActive(true);
+    GameObject.Find("JumpButton").SetActive(true);
+    GameObject.Find("AttackButton").SetActive(true);
+    #else
     GameObject.Find("LeftButton").SetActive(false);
     GameObject.Find("RightButton").SetActive(false);
     GameObject.Find("JumpButton").SetActive(false);

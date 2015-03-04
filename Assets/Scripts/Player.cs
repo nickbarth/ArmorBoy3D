@@ -78,8 +78,8 @@ public class Player : MonoBehaviour {
       bouncing = false;
     }
 
-    if (grounded && hit.collider.gameObject.tag == "Fallable") {
-      hit.collider.gameObject.GetComponent<Fallable>().Fall();
+    if (grounded && hit.collider.CompareTag("Fallable")) {
+      hit.collider.GetComponent<Fallable>().Fall();
     }
 
     if (swordTrail) {
@@ -183,18 +183,27 @@ public class Player : MonoBehaviour {
   }
 
   void OnTriggerEnter(Component component) {
-    if (component.gameObject.tag == "CheckPoint") {
+    if (component.CompareTag("CheckPoint")) {
       LastCheckPoint = component.gameObject;
       component.gameObject.SetActive(false);
     }
 
-    if (component.gameObject.tag == "BadTouch" || (component.gameObject.tag == "Enemy" && !Attacking)) {
+    if (component.CompareTag("BadTouch") || (component.CompareTag("Enemy") && !Attacking)) {
       Kill();
+    }
+
+    if (component.CompareTag("Fallable")) {
+      GetComponent<Collider>().isTrigger = false;
+      component.GetComponent<Fallable>().Fall();
+    }
+
+    if (component.CompareTag("Breakable")) {
+      component.GetComponent<Breakable>().Break();
     }
   }
 
   void OnTriggerStay(Component component) {
-    if (component.gameObject.tag == "LevelPoint") {
+    if (component.CompareTag("LevelPoint")) {
       GameManager.LevelCompleted = true;
 
       anim.SetBool("Attacking", false);
