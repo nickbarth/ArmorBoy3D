@@ -67,6 +67,11 @@ public class Player : MonoBehaviour {
 
     const int noEnemiesLayer = 1 << 8;
     openForward = Physics.Raycast(transform.position, Vector3.right, out hit, 0.2f, ~noEnemiesLayer);
+
+    if (openForward && hit.collider.CompareTag("Breakable")) {
+      hit.collider.GetComponent<Breakable>().Break();
+    }
+
     openBackward = Physics.Raycast(transform.position, Vector3.left, out hit, 0.2f, ~noEnemiesLayer);
     grounded = Physics.Raycast(transform.position, Vector3.down, out hit, 0.4f, ~noEnemiesLayer); 
 
@@ -179,6 +184,10 @@ public class Player : MonoBehaviour {
 
     if (component.gameObject.tag == "Enemy" && !Attacking) {
       Kill();
+    }
+
+    if (component.collider.CompareTag("Breakable")) {
+      component.collider.GetComponent<Breakable>().Break();
     }
   }
 
