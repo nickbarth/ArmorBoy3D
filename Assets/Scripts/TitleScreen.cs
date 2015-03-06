@@ -16,6 +16,8 @@ public class TitleScreen : MonoBehaviour {
 
   public GameObject Text;
 
+  public string Level;
+
   void Awake() {
     GameFader.StartScene();
     TargetPosition = EndPosition;
@@ -34,7 +36,7 @@ public class TitleScreen : MonoBehaviour {
     Title.transform.position = Vector3.Lerp(Title.transform.position, TitleTargetPosition, timer / 10);
 
     if (Input.GetMouseButtonDown(0) || Input.GetKey(KeyCode.Space)) {
-      GameFader.EndScene("Level1");
+      GameFader.EndScene(Level);
     }
 
     if (transform.position == EndPosition) {
