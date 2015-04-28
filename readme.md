@@ -1,6 +1,6 @@
 # ArmorBoy 3D
 
-![ArmorBoy](https://cdn.rawgit.com/nickbarth/ArmorBoy3D/master/screenshot.png)
+![ArmorBoy](https://cdn.rawgit.com/nickbarth/ArmorBoy3D/712be345ba/screenshot.png)
 
 ### License
 
