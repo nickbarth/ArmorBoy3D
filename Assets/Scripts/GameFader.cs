@@ -42,6 +42,12 @@ public class GameFader : MonoBehaviour
 				timer = 0f;
 				sceneEnd = false;
 				image.color = fade;
+				
+				if (nextLevel == "Title") {
+					var gameMusic = GameObject.Find("GameMusic");
+					Destroy(gameMusic);
+				}
+				
 				Application.LoadLevel(nextLevel);
 			}
 		}
