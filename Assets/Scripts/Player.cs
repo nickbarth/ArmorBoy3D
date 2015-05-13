@@ -155,6 +155,7 @@ public class Player : MonoBehaviour {
       Attacking = true;
       anim.SetBool("Attacking", true);
 
+	  GameMusic.PlayAttack();
       GameManager.MakeBreakablesTrigger();
 
       const int noEnemiesLayer = 1 << 8;
@@ -247,7 +248,8 @@ public class Player : MonoBehaviour {
     Destroy(particles, 1f);
 
     GetComponent<Rigidbody>().velocity = new Vector3(0f, 0f, 0f);
-
+	GameMusic.PlayInjure();
+	
     if (!Player.Dead) {
       StartCoroutine(Respawn());
     }

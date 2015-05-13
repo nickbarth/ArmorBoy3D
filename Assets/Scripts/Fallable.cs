@@ -63,6 +63,7 @@ public class Fallable : MonoBehaviour {
 		if (explosion == null) {
 			explosion = Instantiate (particles, transform.position, Quaternion.identity);
 			Destroy (explosion, 1f);
+			GameMusic.PlayCrash();
 		}
 		StartCoroutine(Respawn ());
 	}

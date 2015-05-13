@@ -6,6 +6,7 @@ public class Breakable : MonoBehaviour {
 
   public void Break () {
     Object explosion = Instantiate(Pieces, transform.position, Quaternion.identity);
+	GameMusic.PlayCrash();
     Destroy(gameObject);
     Destroy(explosion, 1f);
   }

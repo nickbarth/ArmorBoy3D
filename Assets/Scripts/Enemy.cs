@@ -111,6 +111,7 @@ public class Enemy : MonoBehaviour, IRespawnable {
       GetComponent<Rigidbody>().useGravity = false;
       GetComponent<Rigidbody>().velocity = new Vector3(0f, 0f, 0f);
       Dead = true;
+	  GameMusic.PlayInjure();
     }
   }
 

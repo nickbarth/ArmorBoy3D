@@ -85,6 +85,8 @@ public class SlimeBoss : MonoBehaviour, IRespawnable {
   public void Injure() {
     var pos = Player.Body.transform.position;
     var injury = new Vector3(pos.x, pos.y, pos.z);
+    
+	GameMusic.PlayInjure();
 
     Lives -= 1;
 
